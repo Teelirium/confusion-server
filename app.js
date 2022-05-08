@@ -41,47 +41,28 @@ app.use(session({
 
 function auth(req, res, next) {
   console.log(req.session);
-
-  if (!req.session.user) {
-    let authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      res.setHeader('WWW-Authenticate', 'Basic');
-      let err = createError(401, 'You are not signed in');
-      return next(err);
-    }
-
-    let auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    let [username, password] = auth;
-    
-    if (username === 'admin' && password === 'password') {
-      req.session.user = 'admin';
-      next();
-    }
-    else {
-      res.setHeader('WWW-Authenticate', 'Basic');
-      let err = createError(401, 'You are not signed in');
-      return next(err);
-    }    
+  if (!req.session.user) {      
+    res.setHeader('WWW-Authenticate', 'Basic');
+    let err = createError(401, 'You are not signed in');
+    return next(err); 
   }
   else {
-    if (req.session.user === 'admin') {
+    if (req.session.user === 'authenticated') {
       return next();
     }
     else {
       res.setHeader('WWW-Authenticate', 'Basic');
-      let err = createError(401, 'You are not signed in');
+      let err = createError(403, 'You are not signed in');
       return next(err);
     }
   }
 }
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 app.use(auth);
 
 app.use(express.static('public'));
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/dishes', dishRouter);
 app.use('/leaders', leaderRouter);
 app.use('/promotions', promoRouter);
