@@ -8,8 +8,13 @@ const passport = require('passport');
 const authenticate = require('../authenticate');
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-    res.send('respond with a resource');
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, 
+(req, res, next) => {
+    User.find({})
+    .then((users) => {
+        res.status(200).json(users);
+    })
+    .catch(err => next(err));
 });
 
 router.post('/signup', (req, res, next) => {
@@ -40,11 +45,11 @@ router.post('/signup', (req, res, next) => {
         });
 });
 router.post('/login', passport.authenticate('local'), 
-    (req, res) => {
-        //@ts-ignore
-        const token = authenticate.getToken({_id: req.user._id});
-        res.status(200).json({success: true, token, status: 'Successfully logged in'});
-    });
+(req, res) => {
+    //@ts-ignore
+    const token = authenticate.getToken({_id: req.user._id});
+    res.status(200).json({success: true, token, status: 'Successfully logged in'});
+});
 /*
 router.post('/login', (req, res, next) => {
     if (!req.session.user) {
