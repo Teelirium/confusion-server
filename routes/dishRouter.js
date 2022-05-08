@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
+const createError = require('http-errors');
 
 const Dishes = require('../models/dishes');
 
@@ -73,8 +74,7 @@ dishRouter.route('/:dishId/comments')
             res.status(200).json(dish.comments);
         }
         else {
-            err = new Error(`Dish ${req.params.dishId} not found`);
-            err.status = 404;
+            let err = createError(404, `Dish ${req.params.dishId} not found`);
             return next(err);
         }
     })
@@ -91,8 +91,7 @@ dishRouter.route('/:dishId/comments')
             });
         }
         else {
-            err = new Error(`Dish ${req.params.dishId} not found`);
-            err.status = 404;
+            let err = createError(404, `Dish ${req.params.dishId} not found`);
             return next(err);
         }
     })
@@ -115,8 +114,7 @@ dishRouter.route('/:dishId/comments')
             });
         }
         else {
-            err = new Error(`Dish ${req.params.dishId} not found`);
-            err.status = 404;
+            let err = createError(404, `Dish ${req.params.dishId} not found`);
             return next(err);
         }
     })
@@ -131,13 +129,11 @@ dishRouter.route('/:dishId/comments/:commentId')
             res.status(200).json(dish.comments.id(req.params.commentId));
         }
         else if (!dish) {
-            err = new Error(`Dish ${req.params.dishId} not found`);
-            err.status = 404;
+            let err = createError(404, `Dish ${req.params.dishId} not found`);
             return next(err);
         }
         else {
-            err = new Error(`Comment ${req.params.commentId} not found`);
-            err.status = 404;
+            let err = createError(404, `Comment ${req.params.commentId} not found`);
             return next(err);
         }
     })
@@ -164,13 +160,11 @@ dishRouter.route('/:dishId/comments/:commentId')
             });
         }
         else if (!dish) {
-            err = new Error(`Dish ${req.params.dishId} not found`);
-            err.status = 404;
+            let err = createError(404, `Dish ${req.params.dishId} not found`);
             return next(err);
         }
         else {
-            err = new Error(`Comment ${req.params.commentId} not found`);
-            err.status = 404;
+            let err = createError(404, `Comment ${req.params.commentId} not found`);
             return next(err);
         }
     })
@@ -187,13 +181,11 @@ dishRouter.route('/:dishId/comments/:commentId')
             });
         }
         else if (!dish) {
-            err = new Error(`Dish ${req.params.dishId} not found`);
-            err.status = 404;
+            let err = createError(404, `Dish ${req.params.dishId} not found`);
             return next(err);
         }
         else {
-            err = new Error(`Comment ${req.params.commentId} not found`);
-            err.status = 404;
+            let err = createError(404, `Comment ${req.params.commentId} not found`);
             return next(err);
         }
     })

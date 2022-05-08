@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var session = require('express-session');
+var FileStore = require('session-file-store');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -14,8 +16,6 @@ const promoRouter = require('./routes/promoRouter');
 const mongoose = require('mongoose');
 const url = 'mongodb://localhost:27017/conFusion';
 const connect = mongoose.connect(url);
-
-const Dishes = require('./models/dishes');
 
 connect.then((db) => {
   console.log('> Connected to mongoDB server');
@@ -30,8 +30,55 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(cookieParser('12345-67890'));
+app.use(session({
+  name: 'sesh',
+  secret: '12345',
+  saveUninitialized: false,
+  resave: false,
+  Store: new FileStore(session),
+}));
+
+function auth(req, res, next) {
+  console.log(req.session);
+
+  if (!req.session.user) {
+    let authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      res.setHeader('WWW-Authenticate', 'Basic');
+      let err = createError(401, 'You are not signed in');
+      return next(err);
+    }
+
+    let auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+    let [username, password] = auth;
+    
+    if (username === 'admin' && password === 'password') {
+      req.session.user = 'admin';
+      next();
+    }
+    else {
+      res.setHeader('WWW-Authenticate', 'Basic');
+      let err = createError(401, 'You are not signed in');
+      return next(err);
+    }    
+  }
+  else {
+    if (req.session.user === 'admin') {
+      return next();
+    }
+    else {
+      res.setHeader('WWW-Authenticate', 'Basic');
+      let err = createError(401, 'You are not signed in');
+      return next(err);
+    }
+  }
+}
+
+app.use(auth);
+
+app.use(express.static('public'));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
