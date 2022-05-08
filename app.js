@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var FileStore = require('session-file-store');
+const passport = require('passport');
+const authenticate = require('./authenticate');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -39,27 +41,21 @@ app.use(session({
   Store: new FileStore(session),
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
 function auth(req, res, next) {
-  console.log(req.session);
-  if (!req.session.user) {      
-    res.setHeader('WWW-Authenticate', 'Basic');
+  if (!req.user) {
     let err = createError(401, 'You are not signed in');
     return next(err); 
   }
   else {
-    if (req.session.user === 'authenticated') {
-      return next();
-    }
-    else {
-      res.setHeader('WWW-Authenticate', 'Basic');
-      let err = createError(403, 'You are not signed in');
-      return next(err);
-    }
+    return next();
   }
 }
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use(auth);
 
 app.use(express.static('public'));
