@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-session": "^1.17.2",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.12",
     "@types/express-session": "^1.17.4",
     "@types/http-errors": "^1.8.2",
     "@types/jsonwebtoken": "^8.5.8",
