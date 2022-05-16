@@ -40,7 +40,7 @@ const options = {
 var secureServer = https.createServer(options, app);
 
 secureServer.listen(app.get('secPort'), () => {
-  console.log('Secure server listening on port ', app.get('secPort'));
+  console.log('> Secure server listening on port', app.get('secPort'));
 });
 
 secureServer.on('error', onError);
@@ -104,5 +104,4 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
   console.log(`> Listening on ${bind}`);
-  console.log(`> http://localhost:${addr.port}`);
 }
