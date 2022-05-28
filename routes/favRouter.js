@@ -60,7 +60,12 @@ favsRouter.route('/:dishId')
 .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 .get(cors.corsWithOptions, authenticate.verifyUser, 
 (req, res, next) => {
-    res.status(403).send('Operation not supported on current route');
+    Favourites.findOne({user: req.user._id})
+    .then(favs => {
+        let doesntExist = !favs || favs.dishes.indexOf(req.params.dishId) < 0;
+        return res.json({exists: !doesntExist, favourites: favs});
+    })
+    .catch(err => next(err))
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, 
 (req, res, next) => {

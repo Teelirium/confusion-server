@@ -8,7 +8,8 @@ const passport = require('passport');
 const authenticate = require('../authenticate');
 const cors = require('./cors');
 
-/* GET users listing. */
+router.options('*', cors.corsWithOptions, (req, res) => res.sendStatus(200));
+
 router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, 
 (req, res, next) => {
     User.find({})
@@ -45,12 +46,35 @@ router.post('/signup', cors.corsWithOptions, (req, res, next) => {
             }
         });
 });
-router.post('/login', cors.corsWithOptions, passport.authenticate('local'), 
-(req, res) => {
-    //@ts-ignore
-    const token = authenticate.getToken({_id: req.user._id});
-    res.status(200).json({success: true, token, status: 'Successfully logged in'});
+
+router.post('/login', cors.corsWithOptions,
+(req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.status(401).json({
+                success: false, 
+                status: 'Login unsuccessful', 
+                err: info
+            });
+        }
+        req.logIn(user, err => {
+            if (err) {
+                res.status(401).json({
+                    success: false, 
+                    status: 'Login unsuccessful', 
+                    err: 'Could not log in user'
+                });    
+            }
+        });
+        //@ts-ignore
+        const token = authenticate.getToken({_id: req.user._id});
+        res.json({success: true, status: 'Successfully logged in', token});
+    })(req, res, next);
 });
+
 router.get('/logout', cors.corsWithOptions, (req, res, next) => {
     if (req.session) {
         req.session.destroy(() => {});
@@ -61,6 +85,18 @@ router.get('/logout', cors.corsWithOptions, (req, res, next) => {
         let err = createError(403, "You are not logged in");
         return next(err);
     }
+});
+
+router.get('/checkJWT', cors.corsWithOptions, (req, res, next) => {
+    passport.authenticate('jwt', {session: false}, (err, user, info) => {
+        if (err) {
+            return next(err)
+        }
+        if (!user) {
+            return res.status(401).json({status: 'JWT invalid', success: false, err: info});
+        }
+        return res.json({status: 'JWT valid', success: true, user});
+    })
 });
 
 module.exports = router;
