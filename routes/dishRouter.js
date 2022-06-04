@@ -14,7 +14,6 @@ dishRouter.route('/')
 .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 .get(cors.cors, (req, res, next) => {
     Dishes.find(req.query)
-        .populate('comments.author')
         .then((dishes) => {
             res.status(200).json(dishes);
         })
@@ -46,7 +45,6 @@ dishRouter.route('/:dishId')
 .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 .get(cors.cors, (req, res, next) => {
     Dishes.findById(req.params.dishId)
-        .populate('comments.author')
         .then((dish) => {
             res.status(200).json(dish);
         })

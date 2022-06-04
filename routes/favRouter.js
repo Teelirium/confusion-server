@@ -17,7 +17,10 @@ favsRouter.route('/')
 (req, res, next) => {
     Favourites.findOne({user: req.user._id})
         .populate('dishes').populate('user')
-        .then((fav) => {
+        .then(async(fav) => {
+            if (fav == null) {
+                fav = await Favourites.create({user:req.user._id});
+            }
             res.json(fav);
         })
         .catch(err => next(err));
@@ -26,7 +29,7 @@ favsRouter.route('/')
 (req, res, next) => {
     Favourites.findOne({user: req.user._id})
     .then((fav) => {
-        if (!fav) {
+        if (fav == null) {
             fav = new Favourites({user:req.user._id});
         }
         fav.dishes = fav.dishes.concat(req.body);

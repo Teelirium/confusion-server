@@ -6,7 +6,7 @@ const app = express();
 const whitelist = [
     'http://localhost:3001', 
     'https://localhost:3444', 
-    'http://90.157.94.66:3000',
+    'http://localhost:3000',
 ]
 const corsOptionsDelegate = (req, cb) => {
     let corsOptions = {};
