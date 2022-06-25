@@ -9,4 +9,4 @@ To run:
 
 ``npm start``
 
-Required env variables are visible in ``config.js``
+Env variables are in ``config.js``
