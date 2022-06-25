@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -20,8 +22,7 @@ const favRouter = require('./routes/favRouter');
 const commentRouter = require('./routes/commentRouter');
 
 const mongoose = require('mongoose');
-const url = config.mongoUrl;
-const connect = mongoose.connect(url);
+const connect = mongoose.connect(config.mongoUrl);
 
 connect.then((db) => {
   console.log('> Connected to mongoDB server');
@@ -38,7 +39,7 @@ app.all('*', (req, res, next) => {
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
